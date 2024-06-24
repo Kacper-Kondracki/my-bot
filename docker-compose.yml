@@ -3,5 +3,7 @@ services:
   app:
     build: .
     command: node build/main.js
+    volumes:
+      - "./database:/app/database"
     environment:
       - BOT_TOKEN=${BOT_TOKEN}
