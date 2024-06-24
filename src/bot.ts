@@ -1,12 +1,29 @@
-import type { Interaction, Message } from "discord.js";
-import { IntentsBitField } from "discord.js";
-import { Client } from "discordx";
+import type { CommandInteraction, Interaction, Message } from "discord.js";
+import { Guild, IntentsBitField } from "discord.js";
+import { Client, GuardFunction } from "discordx";
+import { logger } from "./logger.js";
+import { joinVoiceChannel } from "@discordjs/voice";
+import chalk from "chalk";
+import { db } from "./storage/db.js";
+import { guildHandler } from "./guildHandler.js";
+
+const Log: GuardFunction<CommandInteraction> = async (
+  arg: CommandInteraction,
+  _,
+  next,
+) => {
+  logger.info(
+    "User %s invoked command: %s",
+    chalk.magenta.underline.bold(arg.user.displayName),
+    chalk.red.underline.bold(arg.commandName),
+  );
+  await next();
+};
 
 export const bot = new Client({
   // To use only guild command
-  // botGuilds: [(client) => client.guilds.cache.map((guild) => guild.id)],
-
-  // Discord intents
+  //botGuilds: [(client) => client.guilds.cache.map((guild) => guild.id)],
+  botGuilds: ["1235632166977798175", "1243974312931622952"],
   intents: [
     IntentsBitField.Flags.Guilds,
     IntentsBitField.Flags.GuildMembers,
@@ -15,32 +32,22 @@ export const bot = new Client({
     IntentsBitField.Flags.GuildVoiceStates,
     IntentsBitField.Flags.MessageContent,
   ],
-
-  // Debug logs are disabled in silent mode
-  silent: false,
-
-  // Configuration for @SimpleCommand
-  simpleCommand: {
-    prefix: "!",
-  },
+  guards: [Log],
+  silent: true,
 });
 
 bot.once("ready", () => {
-  // Make sure all guilds are cached
   // await bot.guilds.fetch();
-
-  // Synchronize applications commands with Discord
   void bot.initApplicationCommands();
-
-  // To clear all guild commands, uncomment this line,
-  // This is useful when moving from guild commands to global commands
-  // It must only be executed once
-  //
   //  await bot.clearApplicationCommands(
   //    ...bot.guilds.cache.map((g) => g.id)
   //  );
 
-  console.log("Bot started");
+  db.data.settings.forEach((setting) => {
+    guildHandler(bot, setting);
+  });
+
+  logger.info("Bot started");
 });
 
 bot.on("interactionCreate", (interaction: Interaction) => {
