@@ -14,7 +14,10 @@ type GuildSettings = {
 };
 
 const defaultData: GuildSettings = { settings: [] };
-export const db = await JSONFilePreset<GuildSettings>("db.json", defaultData);
+export const db = await JSONFilePreset<GuildSettings>(
+  "database/db.json",
+  defaultData,
+);
 export async function getOrCreate(guildId: string): Promise<GuildSetting> {
   let guildSettings: GuildSetting | undefined = db.data.settings.find(
     (settings) => settings.guildId == guildId,
