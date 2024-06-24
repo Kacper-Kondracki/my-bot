@@ -167,5 +167,9 @@ export class Example {
     if (!currentlyRunning.has(interaction.guildId!)) {
       guildHandler(bot, await getOrCreate(interaction.guildId!));
     }
+    await interaction.reply({
+      ephemeral: true,
+      content: "OK",
+    });
   }
 }

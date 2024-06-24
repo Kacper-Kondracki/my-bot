@@ -11,6 +11,7 @@ COPY package.json .
 RUN npm install
 
 # Move source files
+copy sound ./sound
 COPY src ./src
 COPY tsconfig.json   .
 
@@ -25,6 +26,7 @@ WORKDIR /app
 
 # Copy package.json from build-runner
 COPY --from=build-runner /tmp/app/package.json /app/package.json
+COPY --from=build-runner /tmp/app/sound /app/sound
 
 # Install dependencies
 RUN npm install --omit=dev
