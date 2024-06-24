@@ -12,42 +12,14 @@ import { AdaSounds } from "../player/player.js";
 import { logger } from "../logger.js";
 import { channel } from "diagnostics_channel";
 import { db, getOrCreate, updateSetting } from "../storage/db.js";
+import { resetRequest } from "../guildHandler.js";
 
 @Discord()
 export class Example {
-  @Slash({ description: "play" })
-  async play(interaction: CommandInteraction): Promise<void> {
-    const setting = await getOrCreate(interaction.guildId!);
-    if (setting.fromChannel === null || setting.toChannel === null) {
-      await interaction.reply({
-        ephemeral: true,
-        content: "No channels set",
-      });
-      return;
-    } else {
-      await interaction.reply({
-        ephemeral: true,
-        content: "Ok",
-      });
-    }
-
-    logger.info("Joining voice channel");
-    const connection = joinVoiceChannel({
-      channelId: setting.fromChannel,
-      guildId: setting.guildId,
-      adapterCreator: interaction.guild?.voiceAdapterCreator!,
-    });
-    const ada = new AdaSounds();
-    connection.subscribe(ada.player)!;
-    logger.info("Playing sound");
-    await ada.play("sound/vip");
-    logger.info("Finished playing sound");
-  }
-
-  @Slash({ name: "set-from-channel", description: "Set from channel" })
+  @Slash({ name: "set-from-channel", description: "Set from voice channel" })
   async setFromChannel(
     @SlashOption({
-      description: "From",
+      description: "From voice channel",
       name: "voice-channel",
       type: ApplicationCommandOptionType.Channel,
       required: true,
@@ -69,10 +41,10 @@ export class Example {
       content: "OK",
     });
   }
-  @Slash({ name: "set-to-channel", description: "Set to channel" })
+  @Slash({ name: "set-to-channel", description: "Set to voice channel" })
   async setToChannel(
     @SlashOption({
-      description: "To",
+      description: "To voice channel",
       name: "voice-channel",
       type: ApplicationCommandOptionType.Channel,
       required: true,
@@ -95,10 +67,10 @@ export class Example {
     });
   }
 
-  @Slash({ name: "add-vip", description: "Add vip" })
+  @Slash({ name: "add-vip", description: "Add vip role" })
   async addVip(
     @SlashOption({
-      description: "Vip",
+      description: "Vip role to add",
       name: "vip",
       type: ApplicationCommandOptionType.Role,
       required: true,
@@ -115,10 +87,10 @@ export class Example {
     });
   }
 
-  @Slash({ name: "remove-vip", description: "remove vip" })
+  @Slash({ name: "remove-vip", description: "Remove vip role" })
   async removeVip(
     @SlashOption({
-      description: "Vip",
+      description: "Vip role to remove",
       name: "vip",
       type: ApplicationCommandOptionType.Role,
       required: true,
@@ -135,10 +107,10 @@ export class Example {
     });
   }
 
-  @Slash({ name: "add-ticket", description: "Add ticket" })
+  @Slash({ name: "add-ticket", description: "Add ticket role" })
   async addTicket(
     @SlashOption({
-      description: "Ticket",
+      description: "Ticket role to add",
       name: "ticket",
       type: ApplicationCommandOptionType.Role,
       required: true,
@@ -155,10 +127,10 @@ export class Example {
     });
   }
 
-  @Slash({ name: "remove-ticket", description: "remove ticket" })
+  @Slash({ name: "remove-ticket", description: "Remove ticket role" })
   async removeTicket(
     @SlashOption({
-      description: "Ticket",
+      description: "Ticket role to remove",
       name: "ticket",
       type: ApplicationCommandOptionType.Role,
       required: true,
@@ -175,12 +147,17 @@ export class Example {
     });
   }
 
-  @Slash({ name: "settings", description: "show settings" })
+  @Slash({ name: "settings", description: "Shows settings" })
   async showSettings(interaction: CommandInteraction): Promise<void> {
     let settings = await getOrCreate(interaction.guildId!);
     await interaction.reply({
       ephemeral: true,
       content: JSON.stringify(settings),
     });
+  }
+
+  @Slash({ name: "restart", description: "Restarts ADA for the server" })
+  async reset(interaction: CommandInteraction): Promise<void> {
+    resetRequest.add(interaction.guildId!);
   }
 }

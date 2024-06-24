@@ -9,3 +9,4 @@ db.json
 # folders
 build
 node_modules
+database

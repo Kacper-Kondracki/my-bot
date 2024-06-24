@@ -10,6 +10,8 @@ import { AdaSounds } from "./player/player.js";
 import chalk from "chalk";
 import { VoiceChannel, VoiceState } from "discord.js";
 
+export const resetRequest = new Set<string>();
+
 export async function guildHandler(client: Client, setting: GuildSetting) {
   if (setting.fromChannel == null || setting.toChannel == null) {
     return;
@@ -67,6 +69,9 @@ export async function guildHandler(client: Client, setting: GuildSetting) {
       client.on("voiceStateUpdate", listener);
 
       while (true) {
+        if (resetRequest.delete(setting.guildId)) {
+          break;
+        }
         await sleep(100);
         let popped = tasks.pop();
         if (popped) {
@@ -108,6 +113,10 @@ export async function guildHandler(client: Client, setting: GuildSetting) {
         chalk.red.underline.bold(guild.name),
       );
     } finally {
+      logger.info(
+        "Cleaning up handler %s",
+        chalk.red.underline.bold(guild.name),
+      );
       sub?.unsubscribe();
       connection?.destroy();
       client.off("voiceStateUpdate", listener);
