@@ -88,7 +88,7 @@ export async function guildHandler(client: Client, setting: GuildSetting) {
             await sleep(500);
 
             try {
-              if (!member.roles.cache.hasAny(...setting.vips)) {
+              if (member.roles.cache.hasAny(...setting.vips)) {
                 await ada.play("sound/vip");
                 await member.voice.setChannel(toChannel);
               } else if (member.roles.cache.hasAny(...setting.tickets)) {
