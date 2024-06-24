@@ -22,8 +22,7 @@ const Log: GuardFunction<CommandInteraction> = async (
 
 export const bot = new Client({
   // To use only guild command
-  //botGuilds: [(client) => client.guilds.cache.map((guild) => guild.id)],
-  botGuilds: ["1235632166977798175", "1243974312931622952"],
+  botGuilds: [(client) => client.guilds.cache.map((guild) => guild.id)],
   intents: [
     IntentsBitField.Flags.Guilds,
     IntentsBitField.Flags.GuildMembers,

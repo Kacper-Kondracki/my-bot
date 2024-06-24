@@ -11,6 +11,7 @@ import chalk from "chalk";
 import { VoiceChannel, VoiceState } from "discord.js";
 
 export const resetRequest = new Set<string>();
+export const currentlyRunning = new Set<string>();
 
 export async function guildHandler(client: Client, setting: GuildSetting) {
   if (setting.fromChannel == null || setting.toChannel == null) {
@@ -45,6 +46,7 @@ export async function guildHandler(client: Client, setting: GuildSetting) {
 
     tasks.push(true);
   };
+  currentlyRunning.add(setting.guildId);
   while (true) {
     while (tasks.length > 0) {
       tasks.pop();

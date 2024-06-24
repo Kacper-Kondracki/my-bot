@@ -12,7 +12,12 @@ import { AdaSounds } from "../player/player.js";
 import { logger } from "../logger.js";
 import { channel } from "diagnostics_channel";
 import { db, getOrCreate, updateSetting } from "../storage/db.js";
-import { resetRequest } from "../guildHandler.js";
+import {
+  currentlyRunning,
+  guildHandler,
+  resetRequest,
+} from "../guildHandler.js";
+import { bot } from "../bot.js";
 
 @Discord()
 export class Example {
@@ -159,5 +164,8 @@ export class Example {
   @Slash({ name: "restart", description: "Restarts ADA for the server" })
   async reset(interaction: CommandInteraction): Promise<void> {
     resetRequest.add(interaction.guildId!);
+    if (!currentlyRunning.has(interaction.guildId!)) {
+      guildHandler(bot, await getOrCreate(interaction.guildId!));
+    }
   }
 }
