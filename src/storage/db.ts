@@ -7,6 +7,7 @@ export type GuildSetting = {
   toChannel: string | null;
   vips: Array<string>;
   tickets: Array<string>;
+  permanentTickets: Array<string>;
 };
 
 type GuildSettings = {
@@ -29,6 +30,7 @@ export async function getOrCreate(guildId: string): Promise<GuildSetting> {
       toChannel: null,
       vips: [],
       tickets: [],
+      permanentTickets: [],
     };
     await db.update(({ settings }) => settings.push(guildSettings!));
   }

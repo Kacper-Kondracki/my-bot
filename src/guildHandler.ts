@@ -89,21 +89,84 @@ export async function guildHandler(client: Client, setting: GuildSetting) {
 
             try {
               if (member.roles.cache.hasAny(...setting.vips)) {
+                logger.info(
+                  "Accepting vip entry for %s on %s",
+                  chalk.red.underline.bold(member.displayName),
+                  chalk.red.underline.bold(guild.name),
+                );
                 await ada.play("sound/vip");
-                await member.voice.setChannel(toChannel);
-              } else if (member.roles.cache.hasAny(...setting.tickets)) {
+                try {
+                  await member.voice.setChannel(toChannel);
+                } catch {
+                  logger.info(
+                    "Couldn't set channel for %s on %s",
+                    chalk.red.underline.bold(member.displayName),
+                    chalk.red.underline.bold(guild.name),
+                  );
+                }
+              } else if (
+                member.roles.cache.hasAny(...setting.permanentTickets)
+              ) {
+                logger.info(
+                  "Accepting permanent ticket entry for %s on %s",
+                  chalk.red.underline.bold(member.displayName),
+                  chalk.red.underline.bold(guild.name),
+                );
                 await ada.play("sound/ticket");
-                await member.voice.setChannel(toChannel);
+                try {
+                  await member.voice.setChannel(toChannel);
+                } catch {
+                  logger.info(
+                    "Couldn't set channel for %s on %s",
+                    chalk.red.underline.bold(member.displayName),
+                    chalk.red.underline.bold(guild.name),
+                  );
+                }
+              } else if (member.roles.cache.hasAny(...setting.tickets)) {
+                logger.info(
+                  "Accepting ticket entry for %s on %s",
+                  chalk.red.underline.bold(member.displayName),
+                  chalk.red.underline.bold(guild.name),
+                );
+                await ada.play("sound/ticket");
+                try {
+                  await member.voice.setChannel(toChannel);
+                } catch {
+                  logger.info(
+                    "Couldn't set channel for %s on %s",
+                    chalk.red.underline.bold(member.displayName),
+                    chalk.red.underline.bold(guild.name),
+                  );
+                }
                 for (const [_, role] of member.roles.cache) {
                   if (setting.tickets.includes(role.id)) {
                     try {
                       await member.roles.remove(role);
-                    } catch {}
+                    } catch {
+                      logger.info(
+                        "Couldn't remove ticket role for %s on %s",
+                        chalk.red.underline.bold(member.displayName),
+                        chalk.red.underline.bold(guild.name),
+                      );
+                    }
                   }
                 }
               } else {
+                logger.info(
+                  "Rejecting entry for %s on %s",
+                  chalk.red.underline.bold(member.displayName),
+                  chalk.red.underline.bold(guild.name),
+                );
                 await ada.play("sound/noTicket");
-                await member.voice.disconnect();
+                try {
+                  await member.voice.disconnect();
+                } catch {
+                  logger.info(
+                    "Couldn't disconnect %s on %s",
+                    chalk.red.underline.bold(member.displayName),
+                    chalk.red.underline.bold(guild.name),
+                  );
+                }
               }
             } catch {}
           }

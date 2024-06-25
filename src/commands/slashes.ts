@@ -152,6 +152,54 @@ export class Example {
     });
   }
 
+  @Slash({
+    name: "add-permanent-ticket",
+    description: "Add permanent ticket role",
+  })
+  async addPermanentTicket(
+    @SlashOption({
+      description: "Permanent ticket role to add",
+      name: "ticket",
+      type: ApplicationCommandOptionType.Role,
+      required: true,
+    })
+    ticket: Role,
+    interaction: CommandInteraction,
+  ): Promise<void> {
+    let settings = await getOrCreate(interaction.guildId!);
+    settings.permanentTickets.push(ticket.id);
+    await updateSetting(settings);
+    await interaction.reply({
+      ephemeral: true,
+      content: "OK",
+    });
+  }
+
+  @Slash({
+    name: "remove-permanent-ticket",
+    description: "Remove permanent ticket role",
+  })
+  async removePermanentTicket(
+    @SlashOption({
+      description: "Permanent ticket role to remove",
+      name: "ticket",
+      type: ApplicationCommandOptionType.Role,
+      required: true,
+    })
+    ticket: Role,
+    interaction: CommandInteraction,
+  ): Promise<void> {
+    let settings = await getOrCreate(interaction.guildId!);
+    settings.permanentTickets = settings.permanentTickets.filter(
+      (v) => v == ticket.id,
+    );
+    await updateSetting(settings);
+    await interaction.reply({
+      ephemeral: true,
+      content: "OK",
+    });
+  }
+
   @Slash({ name: "settings", description: "Shows settings" })
   async showSettings(interaction: CommandInteraction): Promise<void> {
     let settings = await getOrCreate(interaction.guildId!);
