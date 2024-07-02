@@ -17,13 +17,15 @@ export async function guildHandler(client: Client, setting: GuildSetting) {
   if (setting.fromChannel == null || setting.toChannel == null) {
     return;
   }
+  let guild = null;
   try {
-    let guild = await client.guilds.fetch(setting.guildId);
+    guild = await client.guilds.fetch(setting.guildId);
   } catch {
     logger.info(
       "Could not find guild %s",
       chalk.red.underline.bold(setting.guildId),
     );
+    return;
   }
   let fromChannel = (await client.channels.fetch(
     setting.fromChannel,
