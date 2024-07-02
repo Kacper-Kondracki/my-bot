@@ -17,7 +17,14 @@ export async function guildHandler(client: Client, setting: GuildSetting) {
   if (setting.fromChannel == null || setting.toChannel == null) {
     return;
   }
-  let guild = await client.guilds.fetch(setting.guildId);
+  try {
+    let guild = await client.guilds.fetch(setting.guildId);
+  } catch {
+    logger.info(
+      "Could not find guild %s",
+      chalk.red.underline.bold(setting.guildId),
+    );
+  }
   let fromChannel = (await client.channels.fetch(
     setting.fromChannel,
   )) as VoiceChannel;
